@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>user5::목록</title>
+        <script>
+            document.addEventListener("DOMContentLoaded", async function () {
+
+                // 전송 데이터 수신
+                const params = new URLSearchParams(location.search);
+                const seq = params.get('seq');
+
+                console.log(seq);
+
+                // 수정 데이터 요청
+                const response = await fetch('http://localhost:8080/ch09/user5/modify.do?mode=json&seq=' + seq);
+                const data = await response.json();
+
+                console.log(data);
+
+                // 폼에 데이터 바인딩
+                if (data != null) {
+                    document.formUser.seq.value = data.seq;
+                    document.formUser.name.value = data.name;
+                    document.formUser.gender.value = data.gender;
+                    document.formUser.age.value = data.age;
+                    document.formUser.addr.value = data.addr;
+                }
+
+                // 수정 데이터 전송하기
+                const btnSubmit = document.getElementById('submit');
+                btnSubmit.addEventListener('click', async function(e) {
+                    e.preventDefault();
+
+                                        // 폼데이터 생성
+                    const formData = new FormData(document.formUser); // form 태그 name 속성값으로 문서객체 가져오기
+
+                    // 서버 전송
+                    const response = await fetch('http://localhost:8080/ch09/user5/modify.do', {
+                                                method: 'POST',
+                                                body: formData
+                                            });
+                                            
+                    const data = await response.json();
+                    console.log(data);
+
+                    if(data != null) {
+                        alert(data.name + '님 수정 성공!!!');
+
+                        // 목록 이동
+                        location.href = './list.html';
+                    }
+                });
+            });
+        </script>
+    </head>
+
+    <body>
+        <h3>User5 수정</h3>
+
+        <a href="./list.html">취소</a>
+        <form name="formUser">
+            <input type="text" name="mode" value="json" hidden>
+            <table border="1">
+                <tr hidden>
+                    <td>아이디</td>
+                    <td><input type="text" name="seq" readonly></td>
+                </tr>
+                <tr>
+                    <td>이름</td>
+                    <td><input type="text" name="name"></td>
+                </tr>
+                <tr>
+                    <td>성별</td>
+                    <td>
+						<label><input type="radio" name="gender" value="M" ${"M".equals(user5DTO.gender) ? "checked" : ""}>남</label>
+						<label><input type="radio" name="gender" value="F" ${"F".equals(user5DTO.gender) ? "checked" : ""}>여</label>
+					</td>
+                </tr>
+                <tr>
+                    <td>나이</td>
+                    <td><input type="number" name="age"></td>
+                </tr>
+                <tr>
+                    <td>주소</td>
+                    <td><input type="text" name="addr"></td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="right">
+                        <input type="submit" id="submit" value="수정하기">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>user5::목록</title>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+
+                const user5 = document.getElementsByClassName('user5')[0];
+
+                // User1 목록 데이터 요청하기
+                fetch('http://localhost:8080/ch09/user5/list.do?mode=json')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        for (const user of data) {
+                            const html = 
+                                `<tr>
+                                    <td>${user.name}</td>
+                                    <td>${user.gender}</td>
+                                    <td>${user.age}</td>
+                                    <td>${user.addr}</td>
+                                    <td>
+                                        <a href='./modify.html?seq=${user.seq}'>수정</a>
+                                        <a href='#' class='del' data-seq='${user.seq}'>삭제</a>
+                                    </td>
+                                </tr>`;
+
+                            user5.insertAdjacentHTML('beforeend', html);
+                        }
+                    })
+                    .catch(console.log);
+
+                // -----------------------------------
+                // 삭제 요청하기
+                // -----------------------------------
+                const dels = document.getElementsByClassName('del');
+                // 동적 이벤트 처리
+                document.addEventListener('click', async function(e) {
+
+                    if (e.target.classList.contains('del')) {
+                        e.preventDefault();
+
+                        const seq = e.target.dataset.seq; // 태그의 data-(사용자 정의 속성) 값 가져오기
+                        console.log(seq);
+
+                        const params = `mode=json&seq=${seq}`;
+
+                        const response = await fetch(`http://localhost:8080/ch09/user5/delete.do?${params}`);
+                        const data = await response.json();
+
+                        console.log(data);
+
+                        if (data != null) {
+                            alert(data.seq + '삭제 성공!');
+
+                            // 새로고침
+                            location.reload();
+                        }
+                    }
+                })
+            })
+        </script>
+    </head>
+
+    <body>
+        <h3>User5 목록</h3>
+
+        <a href="./list.html">목록</a>
+        <a href="./register.html">등록</a>
+        <table class="user5" border="1">
+            <tr>
+                <th hidden>seq</th>
+                <th>이름</th>
+                <th>성별</th>
+                <th>나이</th>
+                <th>주소</th>
+                <th>관리</th>
+            </tr>
+        </table>
+    </body>
+</html>
