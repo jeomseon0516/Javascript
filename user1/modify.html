@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>user1::수정</title>
+		<script>
+			document.addEventListener('DOMContentLoaded', async function() {
+                
+                // 전송 파라미터 수신
+				const params = new URLSearchParams(location.search);
+                const userid = params.get('userid');
+                
+                const response = await fetch(`http://localhost:8080/ch08/user1/${userid}`);
+                const data = await response.json();
+                
+                console.log(data);
+                
+                const form = document.formUser;
+                form.userid.value = data.userid;
+                form.name.value = data.name;
+                form.hp.value = data.hp;
+                form.age.value = data.age;
+                
+                form.addEventListener('submit', async function(e) {
+                   e.preventDefault();
+                   
+                   const jsonData = {
+                       "userid": this.userid.value,
+	                   "name": this.name.value,
+	                   "hp": this.hp.value,
+	                   "age": this.age.value
+                   };
+                   
+                   console.log(jsonData);
+                   
+                   const modifyResponse = await fetch(`http://localhost:8080/ch08/user1`, {
+                       method: 'PUT',
+	                   headers: {
+                           'content-type': 'application/json',
+	                   },
+	                   body: JSON.stringify(jsonData),
+                   });
+                   
+                   const modifiedData = await modifyResponse.json();
+                   
+                   if (modifiedData != null) {
+                       alert(`수정되었습니다. ${modifiedData.name}`);
+                       location.href = './list.html?modify=success';
+                   }
+                });
+			});
+		</script>
+	</head>
+	<body>
+		<h3>User1 수정</h3>
+		<a href="./list.html">목록</a>
+		
+		<form name="formUser" action="#" method="post">
+			<table border="1">
+				<tr>
+					<td>아이디</td>
+					<td><input type="text" name="userid" value="" readonly="readonly"></td>
+				</tr>
+				<tr>
+					<td>이름</td>
+					<td><input type="text" name="name" value=""></td>
+				</tr>
+				<tr>
+					<td>휴대폰</td>
+					<td><input type="text" name="hp" value=""></td>
+				</tr>
+				<tr>
+					<td>나이</td>
+					<td><input type="number" name="age" value=""></td>
+				</tr>
+				<tr>
+					<td colspan="2" align="right">
+						<input type="submit" value="수정하기">
+					</td>
+				</tr>
+			</table>
+		</form>
+	</body>
+</html>
